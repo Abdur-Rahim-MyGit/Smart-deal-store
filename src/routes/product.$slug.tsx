@@ -174,7 +174,7 @@ function ProductPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
               {product.badges && product.badges.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {product.badges.map((badge) => (
+                  {product.badges.map((badge: string) => (
                     <Badge key={badge} variant="secondary" className="rounded-full">
                       {badge}
                     </Badge>
