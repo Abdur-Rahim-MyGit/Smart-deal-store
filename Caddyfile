@@ -1,0 +1,19 @@
+# Caddy gets and renews the HTTPS certificate on its own — nothing to configure.
+# The API is served from the SAME domain under /api so the httpOnly refresh
+# cookie works without SameSite=none or CORS exceptions.
+{$DOMAIN}, www.{$DOMAIN} {
+	encode gzip zstd
+
+	# Express owns the API and the uploaded-file routes.
+	handle /api/* {
+		reverse_proxy api:5050
+	}
+	handle /uploads/* {
+		reverse_proxy api:5050
+	}
+
+	# Everything else is the server-rendered storefront.
+	handle {
+		reverse_proxy web:3000
+	}
+}

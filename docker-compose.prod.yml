@@ -1,0 +1,59 @@
+# Production stack for a Hostinger VPS: storefront + API behind an HTTPS proxy.
+# MongoDB is not here — it lives on Atlas; set MONGODB_URI in backend/.env.
+#
+#   1. cp .env.production.example .env   and fill in DOMAIN + VITE_API_URL
+#   2. cp backend/.env.example backend/.env   and fill in the secrets
+#   3. docker compose -f docker-compose.prod.yml up -d --build
+services:
+  api:
+    build:
+      context: ./backend
+    container_name: smartdeal_api
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+    volumes:
+      # Product images and seller documents are written to disk, so they must
+      # outlive the container or every rebuild wipes them.
+      - ./backend/uploads:/app/uploads
+      - ./backend/private-uploads:/app/private-uploads
+    expose:
+      - "5050"
+
+  web:
+    build:
+      context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:?set VITE_API_URL in .env next to this file}
+    container_name: smartdeal_web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - "3000"
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: smartdeal_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env next to this file}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  caddy_data:
+  caddy_config:

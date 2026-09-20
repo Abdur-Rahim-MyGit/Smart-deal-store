@@ -1,0 +1,17 @@
+node_modules
+backend/node_modules
+.output
+.tanstack
+.nitro
+.wrangler
+.git
+.lovable
+_unused
+dist
+dist-ssr
+*.log
+.env
+backend/.env
+password
+backend/uploads
+backend/private-uploads
