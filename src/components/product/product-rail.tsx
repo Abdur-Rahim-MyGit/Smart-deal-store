@@ -1,34 +1,45 @@
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Product } from "@/data/catalog";
-import { ProductCard } from "./product-card";
 import { Button } from "@/components/ui/button";
+import type { ProductListing } from "@/lib/types";
+import { ProductCard, ProductCardSkeleton } from "./product-card";
 
 interface ProductRailProps {
   title: string;
-  subtitle?: string;
-  products: Product[];
-  action?: React.ReactNode;
+  subtitle?: string | undefined;
+  products: ProductListing[];
+  loading?: boolean | undefined;
+  action?: ReactNode;
+  /** Hide the whole section when there's nothing to show (instead of an empty state). */
+  hideWhenEmpty?: boolean | undefined;
 }
 
 /** Horizontally scrollable product rail with desktop arrow controls. */
-export function ProductRail({ title, subtitle, products, action }: ProductRailProps) {
+export function ProductRail({
+  title,
+  subtitle,
+  products,
+  loading,
+  action,
+  hideWhenEmpty = true,
+}: ProductRailProps) {
   const scroller = useRef<HTMLDivElement>(null);
 
-  function scrollBy(direction: 1 | -1) {
-    scroller.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
-  }
-
-  if (products.length === 0) {
+  if (!loading && products.length === 0) {
+    if (hideWhenEmpty) return null;
     return (
       <section className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
         <h2 className="font-display text-lg font-bold">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Nothing here yet — new stock lands every Friday.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Nothing here yet — check back soon.</p>
       </section>
     );
   }
+
+  const scrollBy = (direction: 1 | -1) =>
+    scroller.current?.scrollBy({
+      left: direction * scroller.current.clientWidth * 0.8,
+      behavior: "smooth",
+    });
 
   return (
     <section className="space-y-4">
@@ -64,17 +75,45 @@ export function ProductRail({ title, subtitle, products, action }: ProductRailPr
 
       <div
         ref={scroller}
-        className="rail-scroll -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
+        className="rail-scroll -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0"
       >
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="w-[58%] shrink-0 snap-start sm:w-[42%] md:w-[30%] lg:w-[23%] xl:w-[19%]"
-          >
-            <ProductCard product={product} />
-          </div>
-        ))}
+        {loading
+          ? Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="w-[58%] shrink-0 sm:w-[42%] md:w-[30%] lg:w-[23%] xl:w-[19%]"
+              >
+                <ProductCardSkeleton />
+              </div>
+            ))
+          : products.map((product) => (
+              <div
+                key={product._id}
+                className="w-[58%] shrink-0 snap-start sm:w-[42%] md:w-[30%] lg:w-[23%] xl:w-[19%]"
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
       </div>
     </section>
+  );
+}
+
+/** Responsive product grid with skeleton loading. */
+export function ProductGrid({
+  products,
+  loading,
+  skeletonCount = 8,
+}: {
+  products: ProductListing[];
+  loading?: boolean | undefined;
+  skeletonCount?: number;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
+      {loading
+        ? Array.from({ length: skeletonCount }, (_, index) => <ProductCardSkeleton key={index} />)
+        : products.map((product) => <ProductCard key={product._id} product={product} />)}
+    </div>
   );
 }

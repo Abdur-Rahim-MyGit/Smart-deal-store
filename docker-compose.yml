@@ -1,0 +1,49 @@
+# Runs MongoDB and the Smart Deal API.
+# The storefront is a separate Vite/TanStack Start app — see README.md.
+#
+#   1. Copy backend/.env.example to a .env file next to this file and set the secrets
+#   2. docker compose up -d --build
+#   3. docker compose exec api npm run seed     # optional demo data
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: smartdeal_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    container_name: smartdeal_api
+    restart: unless-stopped
+    ports:
+      - "5050:5050"
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      MONGODB_URI: mongodb://mongodb:27017/smartdeal
+      # Origins allowed to call the API (comma separated)
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env}
+      JWT_ACCESS_EXPIRE: ${JWT_ACCESS_EXPIRE:-15m}
+      JWT_REFRESH_EXPIRE: ${JWT_REFRESH_EXPIRE:-7d}
+      # Use "none" (with HTTPS) when the storefront is on a different domain
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
+      # Leave empty in production until a real payment gateway is integrated
+      PAYMENT_MODE: ${PAYMENT_MODE:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  mongo_data:

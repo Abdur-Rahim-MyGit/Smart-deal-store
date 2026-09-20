@@ -20,11 +20,24 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Uploaded files (public images and private seller documents)
+backend/uploads/
+backend/private-uploads/
+
+# Secrets & local credentials
+.env
+backend/.env
+password
+
+# Scratch & unused
+_unused/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+
 *.suo
 *.ntvs*
 *.njsproj
