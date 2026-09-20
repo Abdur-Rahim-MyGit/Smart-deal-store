@@ -1,0 +1,9 @@
+# These files are consumed by Linux containers. A stray CR from a Windows
+# checkout ends up inside env values (PORT=3000\r) and breaks the container,
+# so pin them to LF regardless of the developer's platform.
+Dockerfile        text eol=lf
+.dockerignore     text eol=lf
+Caddyfile         text eol=lf
+docker-compose*.yml text eol=lf
+.env.production.example text eol=lf
+DEPLOY.md         text eol=lf
