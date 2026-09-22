@@ -104,18 +104,19 @@ Build settings (Hostinger detects most of these):
 | Build command | `build` |
 | Output directory | `.output` |
 | Entry file | `server/index.mjs` |
-| Node version | 22 |
+| Node version | **22** (TanStack Start needs 22.12 or newer; 20 fails) |
 
-**Environment variables — only these two:**
+**Environment variables — only this one:**
 
 | Name | Value |
 | --- | --- |
 | `VITE_API_URL` | `https://api.spicesoshop.com/api` |
-| `NODE_ENV` | `production` |
 
-> ⚠️ Do **not** copy the API's variables onto the storefront. `NODE_ENV=development`
-> here makes every page fail with *"This page didn't load"* (the log says
-> `jsxDEV is not a function`).
+> ⚠️ Do **not** copy the API's variables onto the storefront, and do not set
+> `NODE_ENV` here at all — the build already runs in production mode.
+> `NODE_ENV=development` makes every page fail with *"This page didn't load"*
+> (log: `jsxDEV is not a function`). `NODE_ENV=production` makes the build skip
+> its own tools and fail (log: `Cannot find package '@lovable.dev/vite-tanstack-config'`).
 
 `VITE_API_URL` is baked in when the site is built, so **redeploy after changing
 it** — saving the variable alone is not enough.
@@ -156,9 +157,9 @@ hPanel → **Websites → the site → Node.js → Logs** shows what the app pri
 The domain is not connected to the website yet. In hPanel check the website shows
 the domain as connected and SSL as active. New connections can take up to an hour.
 
-**"This page didn't load" on every page**
-The storefront was built with the wrong `NODE_ENV`. Set the storefront's variables
-to exactly the two in A2, then redeploy.
+**"This page didn't load" on every page, or the storefront build fails**
+The storefront has a `NODE_ENV` variable, or is building on Node 20. Leave only
+`VITE_API_URL` (see A2), set Node 22, then redeploy.
 
 **The shop loads but has no products**
 Either the API is down (check `/api/health`) or `VITE_API_URL` is wrong or was
