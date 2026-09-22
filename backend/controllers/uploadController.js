@@ -3,9 +3,10 @@ import fs from "fs";
 import crypto from "crypto";
 import multer from "multer";
 import { badRequest } from "../utils/http.js";
+import { UPLOAD_DIR } from "../config/paths.js";
 
 // Ensure uploads directory exists
-const uploadDir = path.resolve("uploads");
+const uploadDir = UPLOAD_DIR;
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

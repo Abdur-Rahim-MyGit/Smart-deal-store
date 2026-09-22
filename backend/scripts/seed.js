@@ -11,6 +11,7 @@ import path from "path";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { PRIVATE_UPLOAD_DIR } from "../config/paths.js";
 import User from "../models/User.js";
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
@@ -43,7 +44,7 @@ const img = (id, width = 900) =>
 
 /** A one-page placeholder PDF standing in for a scanned trade licence. */
 function writeSampleLicence(owner) {
-  const dir = path.resolve("private-uploads", "vendor-docs");
+  const dir = path.join(PRIVATE_UPLOAD_DIR, "vendor-docs");
   fs.mkdirSync(dir, { recursive: true });
   const text = "Sample trade licence - Smart Deal demo data";
   const stream = `BT /F1 18 Tf 72 720 Td (${text}) Tj ET`;

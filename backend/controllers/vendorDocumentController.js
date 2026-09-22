@@ -6,6 +6,7 @@ import User from "../models/User.js";
 import { HttpError, asyncHandler, badRequest, isObjectId, notFound } from "../utils/http.js";
 import { audit } from "../utils/notify.js";
 import { notifyAdmins } from "../services/orderService.js";
+import { PRIVATE_UPLOAD_DIR } from "../config/paths.js";
 
 /*
  * Seller verification documents (trade licence, VAT certificate). They hold business details,
@@ -17,7 +18,7 @@ export const DOCUMENT_TYPES = {
   vatCertificate: "VAT registration certificate",
 };
 
-const DOCS_DIR = path.resolve("private-uploads", "vendor-docs");
+const DOCS_DIR = path.join(PRIVATE_UPLOAD_DIR, "vendor-docs");
 fs.mkdirSync(DOCS_DIR, { recursive: true });
 
 const FORMATS = {

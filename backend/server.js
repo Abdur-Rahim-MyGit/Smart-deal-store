@@ -26,7 +26,7 @@ import ticketRoutes from "./routes/ticketRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import path from "path";
+import { UPLOAD_DIR } from "./config/paths.js";
 import fs from "fs";
 
 dotenv.config();
@@ -97,12 +97,13 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/uploads", express.static(path.resolve("uploads")));
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-const PORT = Number(process.env.PORT) || 5050;
+// Hostinger passes a unix socket path in PORT rather than a number; listen() takes either.
+const PORT = process.env.PORT || 5050;
 
 async function start() {
   await connectDB();
