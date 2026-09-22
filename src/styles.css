@@ -422,3 +422,33 @@
     color-mix(in oklab, var(--color-secondary) 70%, white) 100%
   );
 }
+
+/* Splash Screen Animations */
+@keyframes splashGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.75;
+  }
+}
+
+@keyframes splashStarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-splash-glow {
+  animation: splashGlowPulse 3s ease-in-out infinite;
+}
+
+.animate-splash-spin-slow {
+  animation: splashStarSpin 30s linear infinite;
+}
+
