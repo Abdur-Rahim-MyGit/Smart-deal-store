@@ -116,11 +116,14 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const t = localStorage.getItem('smartdeal.theme_id');
-                if (t && t !== 'default') document.documentElement.setAttribute('data-theme', t);
-                const m = localStorage.getItem('smartdeal.theme_mode');
-                const dark = m === 'dark' || (m === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                if (dark) document.documentElement.classList.add('dark');
+                const t = localStorage.getItem('smartdeal.theme_id') || 'espresso';
+                document.documentElement.setAttribute('data-theme', t);
+                const m = localStorage.getItem('smartdeal.theme_mode') || 'light';
+                if (m === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
               } catch (e) {}
             `,
           }}

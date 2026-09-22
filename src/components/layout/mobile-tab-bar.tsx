@@ -1,5 +1,6 @@
-import { Heart, Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import { Heart, Home, LayoutGrid, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { CartIcon } from "@/components/common/cart-icon";
 import { useStore } from "@/context/store";
 
 const itemClass =
@@ -52,7 +53,7 @@ export function MobileTabBar() {
         <li>
           <Link to="/cart" className={itemClass} activeProps={activeProps}>
             <span className="relative">
-              <ShoppingCart className="h-5 w-5" />
+              <CartIcon className="h-5 w-5" />
               <Dot value={cartCount} />
             </span>
             Cart

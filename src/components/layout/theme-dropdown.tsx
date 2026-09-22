@@ -25,20 +25,20 @@ export interface ThemeOption {
 
 export const THEMES: ThemeOption[] = [
   {
-    id: "default",
-    name: "Default",
-    subtitle: "Cyber Gold & Obsidian Ink",
-    primaryColor: "#FEEE00",
-    secondaryColor: "#232F3E",
-    badgeBorder: "#E5E7EB",
-  },
-  {
     id: "espresso",
     name: "Espresso & Beige",
-    subtitle: "Rich Velvet Espresso & Silk Nude",
+    subtitle: "Rich Velvet Espresso & Silk Nude (Default)",
     primaryColor: "#2D1912",
     secondaryColor: "#E8D3C3",
     badgeBorder: "#DFC5B2",
+  },
+  {
+    id: "default",
+    name: "Cyber Gold",
+    subtitle: "Vibrant Gold & Obsidian Ink",
+    primaryColor: "#FEEE00",
+    secondaryColor: "#232F3E",
+    badgeBorder: "#E5E7EB",
   },
   {
     id: "sage",
@@ -55,36 +55,30 @@ const STORAGE_MODE_KEY = "smartdeal.theme_mode";
 
 /** Custom Hook for accessing & mutating theme and light/dark mode */
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeId>("default");
+  const [theme, setThemeState] = useState<ThemeId>("espresso");
   const [isDark, setIsDarkState] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    // 1. Initial Theme Id
-    const savedTheme = (window.localStorage.getItem(STORAGE_THEME_KEY) as ThemeId) || "default";
-    const validTheme = THEMES.some((t) => t.id === savedTheme) ? savedTheme : "default";
+    // 1. Initial Theme Id (defaults to espresso)
+    const savedTheme = (window.localStorage.getItem(STORAGE_THEME_KEY) as ThemeId) || "espresso";
+    const validTheme = THEMES.some((t) => t.id === savedTheme) ? savedTheme : "espresso";
 
-    // 2. Initial Mode
+    // 2. Initial Mode (explicitly defaults to light)
     const savedMode = window.localStorage.getItem(STORAGE_MODE_KEY);
-    const prefersDark =
-      savedMode === "dark" ||
-      (savedMode === null && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const isDarkSetting = savedMode === "dark";
 
     setThemeState(validTheme);
-    setIsDarkState(prefersDark);
+    setIsDarkState(isDarkSetting);
     setMounted(true);
 
     // Apply to DOM
-    applyThemeToDOM(validTheme, prefersDark);
+    applyThemeToDOM(validTheme, isDarkSetting);
   }, []);
 
   function applyThemeToDOM(t: ThemeId, dark: boolean) {
     const root = document.documentElement;
-    if (t === "default") {
-      root.removeAttribute("data-theme");
-    } else {
-      root.setAttribute("data-theme", t);
-    }
+    root.setAttribute("data-theme", t);
     root.classList.toggle("dark", dark);
   }
 

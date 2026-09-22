@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { CartIcon } from "@/components/common/cart-icon";
 import { ThemeDropdown } from "@/components/layout/theme-dropdown";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -117,9 +118,9 @@ export function Header() {
 
           <AccountMenu />
 
-          <Button asChild variant="ghost" size="icon" className="relative">
+          <Button asChild variant="ghost" size="icon" className="relative group">
             <Link to="/cart" aria-label={`Cart (${cartCount} items)`}>
-              <ShoppingCart className="h-5 w-5" />
+              <CartIcon className="h-5 w-5 text-foreground transition-transform group-hover:scale-110" />
               {cartCount > 0 && <CountBadge value={cartCount} />}
             </Link>
           </Button>
