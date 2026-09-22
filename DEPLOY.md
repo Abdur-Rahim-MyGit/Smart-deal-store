@@ -1,229 +1,254 @@
 # Deploying Smart Deal on Hostinger
 
 Written for someone who has never deployed a Node app. Follow it top to bottom.
-Every command starting with `$` is typed into the VPS terminal.
 
 ---
 
-## 0. The one thing to understand first
+## 0. What you are deploying
 
-Smart Deal is **not** a WordPress or PHP site. It is two Node.js programs that
-have to stay running:
+Smart Deal is two Node.js programs plus a database:
 
-| Part | What it does | Where it lives |
-| --- | --- | --- |
-| Storefront | Renders the shop pages on the server | `src/` |
-| API | Logins, products, orders, file uploads | `backend/` |
+| Part | What it does | Code | Lives at |
+| --- | --- | --- | --- |
+| Storefront | Renders the shop pages | repo root (`src/`) | `https://spicesoshop.com` |
+| API | Logins, products, orders, uploads | `backend/` | `https://api.spicesoshop.com` |
+| Database | All store data | — | MongoDB Atlas (free) |
 
-Hostinger's **shared plans** (Premium, Business, "Cloud Hosting") only run PHP.
-They cannot run this app — there is no setting to switch on. You need a
-**Hostinger VPS**, which is a real Ubuntu machine you control.
+There are two ways to host it on Hostinger:
 
-Your **domain stays where it is**. You do not lose it and you do not re-buy it.
+- **Option A — Business or Cloud web hosting (Node.js apps).** No server to look
+  after. This is the plan `spicesoshop.com` is on. **Use this one.**
+- **Option B — a VPS with Docker.** Full control over a whole machine. Only needed
+  if you outgrow Option A. Uses `docker-compose.prod.yml`.
 
----
-
-## 1. Check what you already bought
-
-1. Log in at <https://hpanel.hostinger.com>
-2. Look at the top menu.
-   - **Websites** / **Hosting** → shared hosting. Cannot run this app.
-   - **VPS** → you already have what you need. Skip to step 2.
-3. Click **Domains**. Your domain should be listed. Good — keep it.
-
-If you only have shared hosting, it is not wasted: you can park a landing page
-on it, or ask Hostinger support to move the unused credit onto a VPS plan.
-It is worth asking; they often do it.
+Both need the database first.
 
 ---
 
-## 2. Get the VPS
-
-In hPanel: **VPS → Get started**, then:
-
-- **Plan**: KVM 1 works (1 vCPU / 4 GB RAM). **KVM 2** (2 vCPU / 8 GB) is
-  noticeably more comfortable because building the storefront is CPU-heavy.
-- **Location**: closest to your customers.
-- **Operating system**: choose **Ubuntu 24.04 with Docker**. If that exact
-  template is missing, pick plain **Ubuntu 24.04** — step 5 installs Docker.
-- Set a **root password** and save it somewhere safe.
-
-When it finishes, hPanel shows the VPS **IP address** (like `82.112.x.x`).
-Write it down — you need it twice below.
-
----
-
-## 3. Free database (MongoDB Atlas)
-
-Your data lives here, managed and backed up, at no cost.
+## 1. Free database (MongoDB Atlas)
 
 1. Sign up at <https://www.mongodb.com/cloud/atlas/register>
-2. Create a **free M0 cluster** (pick a region near your VPS).
-3. **Database Access** → *Add New Database User*. Username + a long password.
-   Save both.
-4. **Network Access** → *Add IP Address* → enter your **VPS IP address**.
-   (`0.0.0.0/0` also works but lets anyone try to connect — prefer the VPS IP.)
-5. **Database → Connect → Drivers** and copy the connection string. It looks like:
+2. Create a **free M0 cluster**. Pick a region near your customers.
+3. **Database Access** → *Add New Database User*. Choose a username and a long
+   password (letters and digits only avoids trouble later). Save both.
+4. **Network Access** → *Add IP Address* → **Allow access from anywhere**
+   (`0.0.0.0/0`). Web hosting does not promise a fixed outgoing IP, so this is the
+   practical choice; the long password from step 3 is what protects the database.
+5. **Database → Connect → Drivers** and copy the connection string:
 
    ```
    mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/smartdeal?retryWrites=true&w=majority
    ```
 
-   Replace `USER` and `PASSWORD` with the ones from step 3, and make sure
-   `/smartdeal` is in there before the `?`. Keep this string for step 6.
+   Put your username and password in, and make sure `/smartdeal` sits right
+   before the `?`. This is your **`MONGODB_URI`**.
 
 ---
 
-## 4. Point the domain at the VPS
+## Option A — Business web hosting
 
-hPanel → **Domains → your domain → DNS / Nameservers → DNS records**.
+### A1. The API website (`api.spicesoshop.com`)
 
-Delete any existing `A` records for `@` and `www`, then add:
+The API gets its own subdomain. Because it is still on `spicesoshop.com`, the
+browser treats it as the same site and login cookies work normally.
+
+1. hPanel → **Websites → Add website → Node.js app**.
+2. Domain: **`api.spicesoshop.com`**.
+3. Source: connect **GitHub** and pick this repo, or upload a **zip of the
+   `backend` folder** (leave out `node_modules`, `uploads`, `private-uploads`
+   and `.env`).
+4. Build settings:
+
+   | Setting | Value |
+   | --- | --- |
+   | Framework | Express |
+   | Root directory | `backend` (GitHub) or `.` (zip of the folder) |
+   | Entry file | `server.js` |
+   | Node version | 22 |
+   | Build command | *(leave empty)* |
+
+5. **Environment variables** — add exactly these:
+
+   | Name | Value |
+   | --- | --- |
+   | `NODE_ENV` | `production` |
+   | `MONGODB_URI` | your Atlas string from step 1 |
+   | `JWT_SECRET` | a long random string |
+   | `JWT_REFRESH_SECRET` | a *different* long random string |
+   | `JWT_ACCESS_EXPIRE` | `15m` |
+   | `JWT_REFRESH_EXPIRE` | `7d` |
+   | `CLIENT_URL` | `https://spicesoshop.com,https://www.spicesoshop.com` |
+   | `COOKIE_SAMESITE` | `lax` |
+   | `PUBLIC_API_URL` | `https://api.spicesoshop.com/api` |
+   | `STORAGE_DIR` | `/home/u118048059/smartdeal-storage` |
+   | `PAYMENT_MODE` | `test` |
+
+   For the two secrets, any password generator set to 60+ characters works.
+
+   `STORAGE_DIR` keeps uploaded images **outside** the app. Hostinger rebuilds the
+   app into a fresh folder on every deploy, so without it every redeploy deletes
+   all product images. (`u118048059` is this account's username — hPanel shows it
+   under the website's details.)
+
+6. Deploy, then open <https://api.spicesoshop.com/api/health>. You want to see
+   `"database":"connected"`.
+
+### A2. The storefront website (`spicesoshop.com`)
+
+Build settings (Hostinger detects most of these):
+
+| Setting | Value |
+| --- | --- |
+| Framework | Nitro |
+| Root directory | `.` (GitHub) or the folder name inside your zip |
+| Build command | `build` |
+| Output directory | `.output` |
+| Entry file | `server/index.mjs` |
+| Node version | 22 |
+
+**Environment variables — only these two:**
+
+| Name | Value |
+| --- | --- |
+| `VITE_API_URL` | `https://api.spicesoshop.com/api` |
+| `NODE_ENV` | `production` |
+
+> ⚠️ Do **not** copy the API's variables onto the storefront. `NODE_ENV=development`
+> here makes every page fail with *"This page didn't load"* (the log says
+> `jsxDEV is not a function`).
+
+`VITE_API_URL` is baked in when the site is built, so **redeploy after changing
+it** — saving the variable alone is not enough.
+
+### A3. Create your admin account
+
+Do **not** run `npm run seed` on your live database. This repository is public
+and the demo accounts' passwords are written in it, so anyone could sign in as
+your admin.
+
+Create your own admin instead. On your PC, in PowerShell:
+
+```
+cd E:\Smart-deal-store\backend
+npm install
+$env:MONGODB_URI = "<your Atlas string>"
+$env:ADMIN_EMAIL = "you@example.com"
+$env:ADMIN_PASSWORD = "a long password you will remember"
+npm run create-admin
+```
+
+It prints `Created super-admin you@example.com`. Sign in at
+`https://spicesoshop.com/login`. Running it again with the same email just resets
+that admin's password.
+
+### A4. Check everything works
+
+- [ ] <https://api.spicesoshop.com/api/health> shows `"database":"connected"`
+- [ ] <https://spicesoshop.com> loads the shop
+- [ ] You can sign in as your admin
+- [ ] Upload a product image, **redeploy the API**, and the image is still there
+
+### A5. When something goes wrong
+
+hPanel → **Websites → the site → Node.js → Logs** shows what the app printed.
+
+**The domain shows "Parked Domain name on Hostinger DNS system"**
+The domain is not connected to the website yet. In hPanel check the website shows
+the domain as connected and SSL as active. New connections can take up to an hour.
+
+**"This page didn't load" on every page**
+The storefront was built with the wrong `NODE_ENV`. Set the storefront's variables
+to exactly the two in A2, then redeploy.
+
+**The shop loads but has no products**
+Either the API is down (check `/api/health`) or `VITE_API_URL` is wrong or was
+changed without a redeploy.
+
+**`/api/health` fails or says `"database":"disconnected"`**
+Atlas is refusing the connection. Re-check step 1.4 (Network Access) and the
+password in `MONGODB_URI`. If the password has `@ : / ? #` in it, those must be
+percent-encoded (`@` becomes `%40`) — or pick a password without them.
+
+**Login works, then logs you straight out**
+`CLIENT_URL` on the API must list both `https://spicesoshop.com` and
+`https://www.spicesoshop.com`, exactly.
+
+**Product images disappear after a redeploy**
+`STORAGE_DIR` is missing from the API's variables.
+
+---
+
+## Option B — VPS with Docker
+
+Only if you move to a Hostinger VPS. Everything runs on one machine, the API is
+served from the same domain under `/api`, and HTTPS is automatic.
+
+### B1. Get the VPS
+
+hPanel → **VPS → Get started** → **KVM 2** (KVM 1 works but builds slowly) →
+operating system **Ubuntu 24.04 with Docker**. Set a root password and note the
+**IP address**.
+
+### B2. Point the domain at it
+
+hPanel → **Domains → your domain → DNS records**. Replace the `@` and `www`
+records with:
 
 | Type | Name | Points to | TTL |
 | --- | --- | --- | --- |
 | A | `@` | your VPS IP | 300 |
 | A | `www` | your VPS IP | 300 |
 
-DNS usually updates in 5–30 minutes. **Do this before step 7**, because the
-HTTPS certificate can only be issued once the domain points at the VPS.
+Do this before B5 — the HTTPS certificate needs the domain pointing at the VPS.
 
----
+### B3. Open a terminal on the VPS
 
-## 5. Log into the VPS
+hPanel → **VPS → your server → Browser terminal** (no SSH needed). Paste with
+`Ctrl+Shift+V`. Or from PowerShell: `ssh root@YOUR_VPS_IP`.
 
-**Easiest way (no SSH needed):** in hPanel open **VPS -> your server -> Browser terminal**.
-That gives you the same black screen in your web browser, already logged in.
-Skip to the Docker line below.
-
-**Or from your PC:** open **PowerShell** and run (use your real IP):
+### B4. Get the code and configure it
 
 ```
-ssh root@82.112.x.x
+git clone https://github.com/Abdur-Rahim-MyGit/Smart-deal-store.git
+cd Smart-deal-store
+cp .env.production.example .env
+nano .env
 ```
 
-Type `yes`, then the root password. You are now on the server.
-
-> In this black screen, `Ctrl+V` does not paste. Use **right-click** (PowerShell)
-> or `Ctrl+Shift+V` (browser terminal) instead.
-
-Install Docker only if you did **not** pick the Docker template:
+Put your domain in both lines (`DOMAIN=...` and `VITE_API_URL=https://.../api`).
+Save with `Ctrl+O`, `Enter`, `Ctrl+X`.
 
 ```
-$ curl -fsSL https://get.docker.com | sh
+cp backend/.env.example backend/.env
+nano backend/.env
 ```
 
----
+Set `NODE_ENV=production`, `PORT=5050`, `MONGODB_URI`, the two JWT secrets
+(`openssl rand -hex 48`, twice), `CLIENT_URL=https://yourdomain.com,https://www.yourdomain.com`,
+`PUBLIC_API_URL=https://yourdomain.com/api` and `PAYMENT_MODE=test`.
 
-## 6. Put the code on the server
-
-First, on **your PC**, push your latest work to GitHub:
-
-```
-git add -A
-git commit -m "Prepare for deployment"
-git push
-```
-
-Then, on the **VPS**:
+The API runs as the restricted `node` user but Docker creates mounted folders as
+`root`, so make the upload folders writable once:
 
 ```
-$ git clone https://github.com/Abdur-Rahim-MyGit/Smart-deal-store.git
-$ cd Smart-deal-store
+mkdir -p backend/uploads backend/private-uploads
+chown -R 1000:1000 backend/uploads backend/private-uploads
 ```
 
-If the repo is private, GitHub will ask for a username and password — use a
-**Personal Access Token** as the password
-(<https://github.com/settings/tokens> → *Generate new token (classic)* → tick `repo`).
-
-### 6a. Storefront settings
+### B5. Start it
 
 ```
-$ cp .env.production.example .env
-$ nano .env
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Replace `example.com` with your real domain in both lines:
+The first build takes 5–15 minutes. Then create your admin (see A3 for why not
+the seed):
 
 ```
-DOMAIN=yourdomain.com
-VITE_API_URL=https://yourdomain.com/api
+docker compose -f docker-compose.prod.yml exec -e ADMIN_EMAIL=you@example.com -e ADMIN_PASSWORD="a long password" api npm run create-admin
 ```
 
-Save with `Ctrl+O`, `Enter`, then `Ctrl+X`.
-
-### 6b. API settings
-
-```
-$ cp backend/.env.example backend/.env
-$ nano backend/.env
-```
-
-Set these (leave the rest as-is for now):
-
-```
-NODE_ENV=production
-PORT=5050
-MONGODB_URI=<the Atlas string from step 3>
-CLIENT_URL=https://yourdomain.com,https://www.yourdomain.com
-PUBLIC_API_URL=https://yourdomain.com/api
-COOKIE_SAMESITE=lax
-JWT_SECRET=<long random string>
-JWT_REFRESH_SECRET=<a DIFFERENT long random string>
-PAYMENT_MODE=test
-```
-
-To generate the two secrets, run this twice and paste a different result into each:
-
-```
-$ openssl rand -hex 48
-```
-
-> Leave `PAYMENT_MODE=test` until a real Stripe account is connected. Real card
-> charges need `STRIPE_SECRET_KEY` and `PAYMENT_MODE` removed.
-
-### 6c. Make the upload folders writable
-
-The API deliberately runs as the restricted `node` user, but Docker creates
-mounted folders owned by `root`. Without this step, uploading a product image
-fails with a permission error. Run it once:
-
-```
-$ mkdir -p backend/uploads backend/private-uploads
-$ chown -R 1000:1000 backend/uploads backend/private-uploads
-```
-
----
-
-## 7. Start the site
-
-```
-$ docker compose -f docker-compose.prod.yml up -d --build
-```
-
-The first build takes **5–15 minutes** (it compiles the whole storefront).
-Watch it with:
-
-```
-$ docker compose -f docker-compose.prod.yml logs -f
-```
-
-Press `Ctrl+C` to stop watching — that does not stop the site.
-
-Now open **https://yourdomain.com**. HTTPS is issued automatically; no
-certificate to buy or install.
-
-### Load the demo data (optional)
-
-```
-$ docker compose -f docker-compose.prod.yml exec api npm run seed
-```
-
----
-
-## 8. Everyday commands
-
-Run all of these from `~/Smart-deal-store` on the VPS.
+### B6. Everyday commands
 
 | Goal | Command |
 | --- | --- |
@@ -231,59 +256,18 @@ Run all of these from `~/Smart-deal-store` on the VPS.
 | See what is running | `docker compose -f docker-compose.prod.yml ps` |
 | Read the logs | `docker compose -f docker-compose.prod.yml logs -f api` |
 | Restart everything | `docker compose -f docker-compose.prod.yml restart` |
-| Stop the site | `docker compose -f docker-compose.prod.yml down` |
-| Free up disk space | `docker system prune -af` |
+
+**No HTTPS:** `docker compose -f docker-compose.prod.yml logs caddy` — almost
+always DNS not pointing at the VPS yet. **Image uploads fail:** re-run the
+`chown` line, then restart. **Build runs out of memory on KVM 1:** add swap with
+`fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`.
 
 ---
 
-## 9. When something goes wrong
+## Before taking real orders
 
-**The page does not load at all**
-Check DNS has actually moved: `ping yourdomain.com` should answer with your VPS
-IP. If it shows a different IP, wait longer or re-check step 4.
-
-**"Your connection is not private" / no HTTPS**
-Caddy could not get a certificate, almost always because DNS is not pointing at
-the VPS yet, or ports 80/443 are blocked. Check with:
-
-```
-$ docker compose -f docker-compose.prod.yml logs caddy
-$ ufw allow 80 && ufw allow 443
-```
-
-**Site loads but products are empty and login fails**
-The API cannot reach the database. Check:
-
-```
-$ docker compose -f docker-compose.prod.yml logs api
-```
-
-Usually the Atlas IP allowlist (step 3.4) is missing the VPS IP, or the password
-in `MONGODB_URI` is wrong. If the password contains `@ : / ?` or `#`, they must
-be percent-encoded (`@` becomes `%40`).
-
-**Uploading a product image fails**
-The upload folders are owned by `root` instead of the container user. Re-run
-step 6c, then `docker compose -f docker-compose.prod.yml restart api`.
-
-**Login works then immediately logs out**
-`CLIENT_URL` in `backend/.env` does not exactly match the address in the browser
-(`https://` and `www.` must match). Fix it, then `restart`.
-
-**The build runs out of memory on KVM 1**
-Add swap once, then build again:
-
-```
-$ fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
-$ echo '/swapfile none swap sw 0 0' >> /etc/fstab
-```
-
----
-
-## 10. Before taking real orders
-
-- [ ] Change every default password from the seed data
+- [ ] Never seed the live database; if you did, delete the demo accounts
 - [ ] Connect a real payment provider and remove `PAYMENT_MODE=test`
-- [ ] Set the SMTP or `RESEND_API_KEY` values so order emails actually send
+- [ ] Set the SMTP or `RESEND_API_KEY` variables so order emails actually send
 - [ ] Turn on Atlas backups
-- [ ] Back up `backend/uploads/` — those files live only on the VPS disk
+- [ ] Back up the uploads folder (`STORAGE_DIR`, or `backend/uploads` on a VPS)
