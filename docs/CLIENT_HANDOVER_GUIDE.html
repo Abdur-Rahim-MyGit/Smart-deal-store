@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Deal E-Commerce Platform - Client Handover Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    :root {
+      --primary: #c2410c;
+      --primary-dark: #9a3412;
+      --primary-light: #ffedd5;
+      --dark: #0f172a;
+      --gray-dark: #334155;
+      --gray-light: #f8fafc;
+      --border: #e2e8f0;
+      --accent: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f1f5f9;
+      color: var(--gray-dark);
+      line-height: 1.6;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      padding: 45px 50px;
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 25px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title-area h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.5px;
+    }
+
+    .title-area p {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section {
+      margin-bottom: 35px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title span.icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: var(--gray-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .card p, .card div {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .card a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--dark);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      color: #334155;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-pill {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .print-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="header">
+      <div class="title-area">
+        <h1>Smart Deal Store</h1>
+        <p>Complete Client Handover, Portals & Credentials Guide</p>
+      </div>
+      <div>
+        <button class="print-btn" onclick="window.print()">
+          🖨️ Save as PDF / Print
+        </button>
+      </div>
+    </div>
+
+    <!-- Live URLs -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">🌐</span> Platform Live URLs</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>🛍️ Main Storefront</h3>
+          <p>Customer shopping, product catalog & checkout:</p>
+          <p style="margin-top: 6px;"><a href="https://spicesoshop.com" target="_blank">https://spicesoshop.com</a></p>
+        </div>
+        <div class="card">
+          <h3>⚙️ Backend API & Health</h3>
+          <p>Secure Node.js & Database REST API:</p>
+          <p style="margin-top: 6px;"><a href="https://api.spicesoshop.com/api/health" target="_blank">https://api.spicesoshop.com/api/health</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin & Staff Credentials -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">👑</span> Administrator & Staff Logins</h2>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">
+        Sign in at <a href="https://spicesoshop.com/login" target="_blank" style="color: var(--primary); font-weight: 600;">https://spicesoshop.com/login</a> to access the Admin Dashboard.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Super Admin</strong></td>
+            <td><span class="code-pill">admin@smartdeal.ae</span></td>
+            <td><span class="code-pill">adminpassword1234</span></td>
+            <td>Full control over all products, orders, payouts, settings & users</td>
+          </tr>
+          <tr>
+            <td><strong>Staff User</strong></td>
+            <td><span class="code-pill">support@smartdeal.ae</span></td>
+            <td><span class="code-pill">Support@12345</span></td>
+            <td>Order management, customer tickets & review moderation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vendor Accounts -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">🏪</span> Vendor & Seller Logins</h2>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">
+        Vendors manage products, inventory, packing slips & earnings via Vendor Dashboard.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Store Category</th>
+            <th>Seller Email</th>
+            <th>Password</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Beauty & Skincare</strong></td>
+            <td><span class="code-pill">vendor@smartdeal.ae</span></td>
+            <td><span class="code-pill">vendorpassword1234</span></td>
+            <td><span class="badge" style="background:#dcfce7; color:#15803d;">Active Seller</span></td>
+          </tr>
+          <tr>
+            <td><strong>Electronics & Gadgets</strong></td>
+            <td><span class="code-pill">vendor2@smartdeal.ae</span></td>
+            <td><span class="code-pill">Vendor@12345</span></td>
+            <td><span class="badge" style="background:#dcfce7; color:#15803d;">Active Seller</span></td>
+          </tr>
+          <tr>
+            <td><strong>Lifestyle & Fashion</strong></td>
+            <td><span class="code-pill">vendor3@smartdeal.ae</span></td>
+            <td><span class="code-pill">Vendor@12345</span></td>
+            <td><span class="badge" style="background:#dcfce7; color:#15803d;">Active Seller</span></td>
+          </tr>
+          <tr>
+            <td><strong>New Applicant</strong></td>
+            <td><span class="code-pill">newseller@smartdeal.ae</span></td>
+            <td><span class="code-pill">Vendor@12345</span></td>
+            <td><span class="badge" style="background:#fef3c7; color:#92400e;">Pending Approval</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Customer Test Accounts -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">🛍️</span> Customer Test Accounts</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Profile History</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Primary Demo Customer</strong></td>
+            <td><span class="code-pill">user@smartdeal.ae</span></td>
+            <td><span class="code-pill">userpassword1234</span></td>
+            <td>Delivered, shipped & active test orders</td>
+          </tr>
+          <tr>
+            <td><strong>General Customer</strong></td>
+            <td><span class="code-pill">omar@example.ae</span></td>
+            <td><span class="code-pill">Customer@123</span></td>
+            <td>Standard shopper account</td>
+          </tr>
+          <tr>
+            <td><strong>General Customer</strong></td>
+            <td><span class="code-pill">aisha@example.ae</span></td>
+            <td><span class="code-pill">Customer@123</span></td>
+            <td>Standard shopper account</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Promo / Coupons -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">🎟️</span> Active Test Promo Codes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Coupon Code</th>
+            <th>Discount Benefit</th>
+            <th>Conditions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--primary);">WELCOME10</strong></td>
+            <td>10% Off Total</td>
+            <td>Min. Order AED 100 (Max AED 50 discount)</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--primary);">FREESHIP</strong></td>
+            <td>Free Shipping</td>
+            <td>Min. Order AED 50</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--primary);">SAVE50</strong></td>
+            <td>AED 50 Flat Off</td>
+            <td>Min. Order AED 400</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--primary);">BEAUTY15</strong></td>
+            <td>15% Off Category</td>
+            <td>Applies to Beauty & Skincare items</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Infrastructure & Hosting -->
+    <div class="section">
+      <h2 class="section-title"><span class="icon">☁️</span> Infrastructure & Hosting</h2>
+      <div class="card" style="margin-bottom: 12px;">
+        <h3 style="margin-bottom: 6px;">🍃 MongoDB Atlas Cloud Database</h3>
+        <p><strong>Cluster:</strong> cluster0.fr74tkn.mongodb.net | <strong>Database:</strong> smartdeal</p>
+        <p style="margin-top: 4px; font-size: 11px; word-break: break-all;" class="code-pill">mongodb+srv://souban:souban@cluster0.fr74tkn.mongodb.net/smartdeal?retryWrites=true&w=majority</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom: 6px;">⚡ Hostinger hPanel Details</h3>
+        <p><strong>Storefront App:</strong> spicesoshop.com (Node.js 22.x / Nitro Server)</p>
+        <p><strong>API App:</strong> api.spicesoshop.com (Node.js 22.x / Express)</p>
+        <p><strong>Uploads Storage:</strong> /home/u118048059/smartdeal-storage</p>
+        <p><strong>Payment Mode:</strong> Simulated Test Gateway (Ready for live Stripe keys)</p>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
