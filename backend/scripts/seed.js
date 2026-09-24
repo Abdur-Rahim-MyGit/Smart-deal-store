@@ -32,10 +32,17 @@ import NotificationTemplate from "../models/NotificationTemplate.js";
 import Campaign from "../models/Campaign.js";
 import { computeTotals } from "../utils/pricing.js";
 import { pick, round2, slugify } from "../utils/http.js";
+import dns from "dns";
 import { variantLabel } from "../utils/catalog.js";
 import { computeVendorBalances } from "../services/orderService.js";
 
 dotenv.config();
+
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch {
+  // Ignore if restricted
+}
 
 const DAY = 24 * 60 * 60 * 1000;
 const HOUR = 60 * 60 * 1000;

@@ -79,7 +79,10 @@ async function run() {
     });
     const uploadData = await uploadRes.json();
     test("Image upload endpoint accepts multipart form file", uploadData.success === true);
-    test("Upload returns accessible URL", Boolean(uploadData.url && uploadData.url.includes("/uploads/")));
+    test(
+      "Upload returns accessible URL",
+      Boolean(uploadData.url && uploadData.url.includes("/uploads/")),
+    );
 
     // Clean up temp test file if created
     if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
@@ -112,7 +115,10 @@ async function run() {
       body: JSON.stringify({ emirate: "Dubai", shippingMethod: "standard" }),
     });
     const paymentData = await paymentRes.json();
-    test("Payment Intent endpoint generates client secret in AED", Boolean(paymentData.clientSecret));
+    test(
+      "Payment Intent endpoint generates client secret in AED",
+      Boolean(paymentData.clientSecret),
+    );
     test("Payment gateway currency is AED", paymentData.currency === "AED");
   } catch (err) {
     test("Payment Intent endpoint", false, err.message);

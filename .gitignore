@@ -29,9 +29,6 @@ backend/private-uploads/
 backend/.env
 password
 
-# Scratch & unused
-_unused/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

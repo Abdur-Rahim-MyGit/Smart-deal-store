@@ -8,11 +8,11 @@ Written for someone who has never deployed a Node app. Follow it top to bottom.
 
 Smart Deal is two Node.js programs plus a database:
 
-| Part | What it does | Code | Lives at |
-| --- | --- | --- | --- |
-| Storefront | Renders the shop pages | repo root (`src/`) | `https://spicesoshop.com` |
-| API | Logins, products, orders, uploads | `backend/` | `https://api.spicesoshop.com` |
-| Database | All store data | — | MongoDB Atlas (free) |
+| Part       | What it does                      | Code               | Lives at                      |
+| ---------- | --------------------------------- | ------------------ | ----------------------------- |
+| Storefront | Renders the shop pages            | repo root (`src/`) | `https://spicesoshop.com`     |
+| API        | Logins, products, orders, uploads | `backend/`         | `https://api.spicesoshop.com` |
+| Database   | All store data                    | —                  | MongoDB Atlas (free)          |
 
 There are two ways to host it on Hostinger:
 
@@ -29,9 +29,9 @@ Both need the database first.
 
 1. Sign up at <https://www.mongodb.com/cloud/atlas/register>
 2. Create a **free M0 cluster**. Pick a region near your customers.
-3. **Database Access** → *Add New Database User*. Choose a username and a long
+3. **Database Access** → _Add New Database User_. Choose a username and a long
    password (letters and digits only avoids trouble later). Save both.
-4. **Network Access** → *Add IP Address* → **Allow access from anywhere**
+4. **Network Access** → _Add IP Address_ → **Allow access from anywhere**
    (`0.0.0.0/0`). Web hosting does not promise a fixed outgoing IP, so this is the
    practical choice; the long password from step 3 is what protects the database.
 5. **Database → Connect → Drivers** and copy the connection string:
@@ -59,29 +59,29 @@ browser treats it as the same site and login cookies work normally.
    and `.env`).
 4. Build settings:
 
-   | Setting | Value |
-   | --- | --- |
-   | Framework | Express |
+   | Setting        | Value                                         |
+   | -------------- | --------------------------------------------- |
+   | Framework      | Express                                       |
    | Root directory | `backend` (GitHub) or `.` (zip of the folder) |
-   | Entry file | `server.js` |
-   | Node version | 22 |
-   | Build command | *(leave empty)* |
+   | Entry file     | `server.js`                                   |
+   | Node version   | 22                                            |
+   | Build command  | _(leave empty)_                               |
 
 5. **Environment variables** — add exactly these:
 
-   | Name | Value |
-   | --- | --- |
-   | `NODE_ENV` | `production` |
-   | `MONGODB_URI` | your Atlas string from step 1 |
-   | `JWT_SECRET` | a long random string |
-   | `JWT_REFRESH_SECRET` | a *different* long random string |
-   | `JWT_ACCESS_EXPIRE` | `15m` |
-   | `JWT_REFRESH_EXPIRE` | `7d` |
-   | `CLIENT_URL` | `https://spicesoshop.com,https://www.spicesoshop.com` |
-   | `COOKIE_SAMESITE` | `lax` |
-   | `PUBLIC_API_URL` | `https://api.spicesoshop.com/api` |
-   | `STORAGE_DIR` | `/home/u118048059/smartdeal-storage` |
-   | `PAYMENT_MODE` | `test` |
+   | Name                 | Value                                                 |
+   | -------------------- | ----------------------------------------------------- |
+   | `NODE_ENV`           | `production`                                          |
+   | `MONGODB_URI`        | your Atlas string from step 1                         |
+   | `JWT_SECRET`         | a long random string                                  |
+   | `JWT_REFRESH_SECRET` | a _different_ long random string                      |
+   | `JWT_ACCESS_EXPIRE`  | `15m`                                                 |
+   | `JWT_REFRESH_EXPIRE` | `7d`                                                  |
+   | `CLIENT_URL`         | `https://spicesoshop.com,https://www.spicesoshop.com` |
+   | `COOKIE_SAMESITE`    | `lax`                                                 |
+   | `PUBLIC_API_URL`     | `https://api.spicesoshop.com/api`                     |
+   | `STORAGE_DIR`        | `/home/u118048059/smartdeal-storage`                  |
+   | `PAYMENT_MODE`       | `test`                                                |
 
    For the two secrets, any password generator set to 60+ characters works.
 
@@ -97,24 +97,24 @@ browser treats it as the same site and login cookies work normally.
 
 Build settings (Hostinger detects most of these):
 
-| Setting | Value |
-| --- | --- |
-| Framework | Nitro |
-| Root directory | `.` (GitHub) or the folder name inside your zip |
-| Build command | `build` |
-| Output directory | `.output` |
-| Entry file | `server/index.mjs` |
-| Node version | **22** (TanStack Start needs 22.12 or newer; 20 fails) |
+| Setting          | Value                                                  |
+| ---------------- | ------------------------------------------------------ |
+| Framework        | Nitro                                                  |
+| Root directory   | `.` (GitHub) or the folder name inside your zip        |
+| Build command    | `build`                                                |
+| Output directory | `.output`                                              |
+| Entry file       | `server/index.mjs`                                     |
+| Node version     | **22** (TanStack Start needs 22.12 or newer; 20 fails) |
 
 **Environment variables — only this one:**
 
-| Name | Value |
-| --- | --- |
+| Name           | Value                             |
+| -------------- | --------------------------------- |
 | `VITE_API_URL` | `https://api.spicesoshop.com/api` |
 
 > ⚠️ Do **not** copy the API's variables onto the storefront, and do not set
 > `NODE_ENV` here at all — the build already runs in production mode.
-> `NODE_ENV=development` makes every page fail with *"This page didn't load"*
+> `NODE_ENV=development` makes every page fail with _"This page didn't load"_
 > (log: `jsxDEV is not a function`). `NODE_ENV=production` makes the build skip
 > its own tools and fail (log: `Cannot find package '@lovable.dev/vite-tanstack-config'`).
 
@@ -195,10 +195,10 @@ operating system **Ubuntu 24.04 with Docker**. Set a root password and note the
 hPanel → **Domains → your domain → DNS records**. Replace the `@` and `www`
 records with:
 
-| Type | Name | Points to | TTL |
-| --- | --- | --- | --- |
-| A | `@` | your VPS IP | 300 |
-| A | `www` | your VPS IP | 300 |
+| Type | Name  | Points to   | TTL |
+| ---- | ----- | ----------- | --- |
+| A    | `@`   | your VPS IP | 300 |
+| A    | `www` | your VPS IP | 300 |
 
 Do this before B5 — the HTTPS certificate needs the domain pointing at the VPS.
 
@@ -251,12 +251,12 @@ docker compose -f docker-compose.prod.yml exec -e ADMIN_EMAIL=you@example.com -e
 
 ### B6. Everyday commands
 
-| Goal | Command |
-| --- | --- |
-| Deploy new code | `git pull && docker compose -f docker-compose.prod.yml up -d --build` |
-| See what is running | `docker compose -f docker-compose.prod.yml ps` |
-| Read the logs | `docker compose -f docker-compose.prod.yml logs -f api` |
-| Restart everything | `docker compose -f docker-compose.prod.yml restart` |
+| Goal                | Command                                                               |
+| ------------------- | --------------------------------------------------------------------- |
+| Deploy new code     | `git pull && docker compose -f docker-compose.prod.yml up -d --build` |
+| See what is running | `docker compose -f docker-compose.prod.yml ps`                        |
+| Read the logs       | `docker compose -f docker-compose.prod.yml logs -f api`               |
+| Restart everything  | `docker compose -f docker-compose.prod.yml restart`                   |
 
 **No HTTPS:** `docker compose -f docker-compose.prod.yml logs caddy` — almost
 always DNS not pointing at the VPS yet. **Image uploads fail:** re-run the

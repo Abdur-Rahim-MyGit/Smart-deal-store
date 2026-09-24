@@ -8,15 +8,24 @@
  * MONGODB_URI comes from the environment or backend/.env.
  */
 import mongoose from "mongoose";
+import dns from "dns";
 import dotenv from "dotenv";
 import User from "../models/User.js";
 
 dotenv.config();
 
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch {
+  // Ignore if restricted
+}
+
 const { MONGODB_URI, ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME = "Store Admin" } = process.env;
 
 if (!MONGODB_URI || !ADMIN_EMAIL || !ADMIN_PASSWORD) {
-  console.error("Set MONGODB_URI, ADMIN_EMAIL and ADMIN_PASSWORD (see the usage note in this file).");
+  console.error(
+    "Set MONGODB_URI, ADMIN_EMAIL and ADMIN_PASSWORD (see the usage note in this file).",
+  );
   process.exit(1);
 }
 if (ADMIN_PASSWORD.length < 12) {

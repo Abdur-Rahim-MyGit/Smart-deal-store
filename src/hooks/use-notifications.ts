@@ -30,7 +30,9 @@ export function useNotifications() {
 
     let source: EventSource | null = null;
     try {
-      source = new EventSource(`${API_URL}/notifications/stream?token=${encodeURIComponent(token)}`);
+      source = new EventSource(
+        `${API_URL}/notifications/stream?token=${encodeURIComponent(token)}`,
+      );
 
       source.onmessage = (event) => {
         try {

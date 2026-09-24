@@ -1,4 +1,12 @@
 import mongoose from "mongoose";
+import dns from "dns";
+
+// Support mongodb+srv on Windows environments where default DNS drops SRV lookups
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch {
+  // Ignore if restricted
+}
 
 const connectDB = async () => {
   try {

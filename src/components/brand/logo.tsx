@@ -13,7 +13,10 @@ export function Logo({
   return (
     <Link
       to="/"
-      className={cn("group flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-95", className)}
+      className={cn(
+        "group flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-95",
+        className,
+      )}
       aria-label="Smart Deal home"
     >
       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl shadow-sm ring-1 ring-amber-500/30 transition-transform group-hover:scale-105">

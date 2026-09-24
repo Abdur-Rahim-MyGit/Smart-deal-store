@@ -425,7 +425,8 @@
 
 /* Splash Screen Animations */
 @keyframes splashGlowPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.35;
   }
@@ -451,4 +452,3 @@
 .animate-splash-spin-slow {
   animation: splashStarSpin 30s linear infinite;
 }
-

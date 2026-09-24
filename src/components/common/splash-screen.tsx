@@ -63,8 +63,7 @@ export function SplashScreen({ forceShow = false }: { forceShow?: boolean }) {
         fading ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100",
       )}
       style={{
-        background:
-          "radial-gradient(circle at center, #2F170E 0%, #1A0C07 55%, #100603 100%)",
+        background: "radial-gradient(circle at center, #2F170E 0%, #1A0C07 55%, #100603 100%)",
       }}
     >
       {/* Background Animated Subtle Islamic Geometric Star Ray Effect */}
